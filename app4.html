@@ -67,9 +67,9 @@
 		white-space: pre-line;
 		
 	}
-	.gametable {
+	.recentActions1 {
 		
-		background-color: #346fa6;
+		background-color: #444b59;
 		border: 1px;
 		color: white;
 		text-align: center;
@@ -81,7 +81,23 @@
 		margin: 1px;
 		white-space: pre-line;
 		
-	}.techID {
+	}
+	.recentActions2 {
+		
+		background-color: #869fa4;
+		border: 1px;
+		color: white;
+		text-align: center;
+		text-decoration: none;
+		border-radius: 8px;
+		width: 200px;
+		align-items: center;
+		font-size: 14px;
+		margin: 1px;
+		white-space: pre-line;
+		
+	}
+	.techID {
 		
 		background-color: #79c9c1;
 		border: 1px;
@@ -129,9 +145,13 @@
 
 <script>
 
+
 let main_loop;
-let img = [];
 let animTimer = 0;
+let debugSetting = 0;
+let debug_FAST_MODE = false;
+let debugFlag1 = false;
+
 let gt;
 let cvs;
 let ctxI;
@@ -358,17 +378,7 @@ let names = [
 function init () {
 	gt = document.getElementById("newGUI");
 
-
-	img[0] = new Image();
-	img[0].src = './imgs/tech_green.png';
-	img[1] = new Image();
-	img[1].src = './imgs/tech_blue.png';
-	img[2] = new Image();
-	img[2].src = './imgs/tech_grey.png';
-	img[3] = new Image();
-	img[3].src = './imgs/tech_white.png';
-
-	main_loop = setInterval(progressTime, 100);
+	main_loop = setInterval(progressTime, 1000); //1000 is 1 sec
 	
 	company.tools.push(new Tool());
 	hireTech(0);
@@ -382,10 +392,11 @@ function init () {
 let f="<button onclick='buyNewBay()'>Buy new bay for 5,000</button>\n<button onclick='payForRandShortage()'>Buy random Shortage for 1,000</button>\n<button onclick='hireTech(5000)'>Hire new random tech for 5,000</button>"
 
 document.getElementById("gui2").innerHTML = f;
+
 }
 
 const company = {
-	money:10000,
+	money:20000,
 	shift:1,
 	time:0,
 	bays:2,
@@ -595,7 +606,7 @@ function hireTech(cost) {
 	if(chance(1)) {
 		let n = company.techs.length-1
 		company.techs[n].assembProf=0;
-		company.techs[n].testProf=9;
+		company.techs[n].testProf=8;
 		company.techs[n].assembProfGrowth=0;
 		company.techs[n].testProfGrowth=9;
 		company.techs[n].name="Cool Ron";
@@ -666,7 +677,7 @@ let s = "\nRecent Actions:<hr><span style='color:#aaa'>";
 
 	
 	for(let i = company.recentActions.length-1; i > 0; i--) {
-		s=s +""+ company.recentActions[i] +"<br>";
+		s=s +"<div class='recentActions2'>"+ company.recentActions[i] +"</div>";
 	}
 	
 document.getElementById("recentActions").innerHTML = s + "</span>";
@@ -882,9 +893,23 @@ function drawTechShape(x, y, morale, role, ctx, lastPerc, name) {
 	
 }
 
-
+function toggleSpeed() {
+	debugFlag1=true;
+}
 
 function progressTime() {
+	if(debugFlag1) {
+		if(!debug_FAST_MODE) {
+			clearInterval(main_loop);
+			main_loop = setInterval(progressTime, 100); 
+			debug_FAST_MODE = !debug_FAST_MODE;
+		} else {
+			clearInterval(main_loop);
+			main_loop = setInterval(progressTime, 1000);
+			debug_FAST_MODE = !debug_FAST_MODE;
+		}
+		debugFlag1 = false;
+	}
 	company.time++;
 
 	if(company.time > 11) {
@@ -902,7 +927,7 @@ function progressTime() {
 		
 
 		if(company.tools[i].isComplete) {
-			let completionMoney = 10000;
+			let completionMoney = 15000;
 			addAct(company.tools[i].ben + " was completed in " + (company.shift-company.tools[i].startingShift)+" shift(s). Added "+completionMoney+" to Money.")
 			unassignAllTechsFromTool(i);
 			pop_i(company.tools,i);
@@ -1080,6 +1105,8 @@ function giveTechRaise(index) {
 
 }
 
+
+
 function addAct(s) {
 	company.recentActions.push(s);
 	if(company.recentActions.length > 20)
@@ -1120,21 +1147,23 @@ function doPayroll(){
 
 <body  onload="init()">
 	<h1>Supe Simulator</h1>
-
+	<p class="recentActions1" onclick="toggleSpeed()">debug SuperSpeed</p>
 	<table>
 		<tr>
-			<td style="width: 90%;overflow-x: scroll;">
+			<td style="width: 85%;">
+				<div style="width: 1000px;overflow-x: scroll;">
 				<table id="newGUI"></table>
+				</div>
 			</td>
-			<td rowspan="2">
+			<td rowspan="2" style="width: 300px;"">
 				<p class="gametable" style="font-size: 1.1em;line-height: 1.3;white-space: pre-line;" id="gui"></p>
 				<p class="gametable"  id="gui2"></p>
-				<div class="gametable" style="overflow-y: scroll;height: 250px;white-space: pre-line;" id="recentActions"></div>
+				<div class="recentActions1" style="overflow-y: scroll;height: 250px;white-space: pre-line;" id="recentActions"></div>
 			</td>
 		</tr>
 
 		<tr>
-			<td>
+			<td style="width: 85%;">
 				<div style="background-color: azure;overflow-x: scroll;" id="techs">Test</div>
 			</td>
 		</tr>
